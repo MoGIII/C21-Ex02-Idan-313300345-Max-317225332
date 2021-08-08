@@ -8,12 +8,13 @@
 
     public partial class FormMain : Form
     {
-        private readonly FacebookConnectionManger r_Connection;
+        //private readonly FacebookConnectionManger r_Connection;
         private List<Label> m_ComponentToVisible = new List<Label>();
+        private FacebookApiFacade m_FacebookFacade;
 
         public FormMain()
         {
-            r_Connection = new FacebookConnectionManger();
+            m_FacebookFacade = new FacebookApiFacade();
             InitializeComponent();
             FacebookService.s_CollectionLimit = 100;
             addedComponentToListVisible();
@@ -21,8 +22,9 @@
 
         public void FetchInitialData()
         {
+            string profilePictureUrl = m_FacebookFacade.GetUserInformation<string>("PictureNormalURL");
             // User profile picture:
-            pictureBoxProfilePhoto.LoadAsync(r_Connection.LoginResult.LoggedInUser.PictureNormalURL);
+            pictureBoxProfilePhoto.LoadAsync(profilePictureUrl);
         }
 
         private void buttonLogin_Click(object sender, EventArgs e)
@@ -44,24 +46,15 @@
         {
             try
             {
-                if(!r_Connection.IsUserLoggedIn())
-                {
-                    r_Connection.LoginToUser();
-                    if(r_Connection.IsUserLoggedIn())
-                    {
-                        labelNameOfUser.Text = r_Connection.LoginResult.LoggedInUser.Name;
-                        labelEmail.Text = r_Connection.LoggedInUser.Email;
-                        labelBirthday.Text = r_Connection.LoggedInUser.Birthday;
-                        changeLabelVisible(m_ComponentToVisible, true);
-                        FetchInitialData();
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("The user already logged in");
-                }
+                m_FacebookFacade.Login();
+                labelNameOfUser.Text =
+                    m_FacebookFacade.GetUserInformation<string>("Name");
+                labelEmail.Text = m_FacebookFacade.GetUserInformation<string>("Email");
+                labelBirthday.Text = m_FacebookFacade.GetUserInformation<string>("Birthday");
+                changeLabelVisible(m_ComponentToVisible, true);
+                FetchInitialData();
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -82,25 +75,18 @@
 
         private void logoutUser()
         {
-            if(r_Connection.IsUserLoggedIn())
+            try
             {
-                try
-                {
-                    r_Connection.LogoutUserApi();
-                    buttonLogin.Text = "Login";
-                    labelNameOfUser.Text = string.Empty;
-                    changeLabelVisible(m_ComponentToVisible, false);
-                    this.Controls.Clear();
-                    this.InitializeComponent();
-                }
-                catch
-                {
-                    MessageBox.Show("Cannot logout from user");
-                }
+                m_FacebookFacade.Logout();
+                buttonLogin.Text = "Login";
+                labelNameOfUser.Text = string.Empty;
+                changeLabelVisible(m_ComponentToVisible, false);
+                this.Controls.Clear();
+                this.InitializeComponent();
             }
-            else
+            catch(Exception e)
             {
-                MessageBox.Show("You are not logged in to log out");
+                MessageBox.Show(e.Message);
             }
         }
 
