@@ -1,8 +1,4 @@
-﻿// $G$ THE-001 (-22) your grade on diagrams document - 69. please see comments inside the document. 40% of your grade).
-// $G$ RUL-004 (-20) Wrong zip name format / folder name format
-// $G$ RUL-005 (-20) Wrong zip folder structure
-
-namespace BasicFacebookFeatures
+﻿namespace BasicFacebookFeatures
 {
     using System;
     using System.Windows.Forms;

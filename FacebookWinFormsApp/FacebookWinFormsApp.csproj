@@ -90,7 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FacebookApiFacade.cs" />
-    <Compile Include="FacebookConnectionManger.cs" />
+    <Compile Include="FacebookConnectionMangerSingleton.cs" />
     <Compile Include="FacebookPhotosHandlerLogic.cs" />
     <Compile Include="FacebookFriendsHandlerLogic.cs" />
     <Compile Include="FormMain.cs">
