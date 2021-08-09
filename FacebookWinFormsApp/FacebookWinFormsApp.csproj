@@ -68,10 +68,10 @@
       <HintPath>..\packages\CefSharp.WinForms.87.1.132\lib\net452\CefSharp.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="Facebook">
-      <HintPath>..\..\..\..\..\C# Projects\test\FBApi\Facebook.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\FBApi\Facebook.dll</HintPath>
     </Reference>
     <Reference Include="FbGraphApiWrapper">
-      <HintPath>..\..\..\..\..\C# Projects\test\FBApi\FbGraphApiWrapper.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\FBApi\FbGraphApiWrapper.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.dll</HintPath>

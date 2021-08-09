@@ -26,6 +26,60 @@ namespace BasicFacebookFeatures
             return objectToReturn;
         }
 
+        public FacebookObjectCollection<Photo> FilterAllPhotosFeature()
+        {
+            FacebookObjectCollection<Photo> photos = null;
+            if (r_ConnectionManager.IsUserLoggedIn())
+            {
+                FacebookObjectCollection<Album> userAlbums = r_ConnectionManager.LoggedInUser.Albums;
+                photos = FacebookPhotosHandlerLogic.ExtractPhotosFromAlbum(userAlbums);
+            }
+            return photos;
+        }
+
+        public FacebookObjectCollection<Photo> FilterPhotosByDateFeature(DateTime i_StartTime, DateTime i_EndTime )
+        {
+            FacebookObjectCollection<Photo> photos = null;
+            if (r_ConnectionManager.IsUserLoggedIn())
+            {
+                FacebookObjectCollection<Album> userAlbums = r_ConnectionManager.LoggedInUser.Albums;
+                photos = FacebookPhotosHandlerLogic.FilterPhotoByDate(userAlbums, i_StartTime, i_EndTime);
+            }
+            return photos;
+        }
+
+        public FacebookObjectCollection<Photo> FilterPhotosByLocationFeature(string i_Location)
+        {
+            FacebookObjectCollection<Photo> photos = null;
+            if (r_ConnectionManager.IsUserLoggedIn())
+            {
+                FacebookObjectCollection<Album> userAlbums = r_ConnectionManager.LoggedInUser.Albums;
+                photos = FacebookPhotosHandlerLogic.FilterPhotoByLocation(userAlbums, i_Location);
+            }
+            return photos;
+        }
+
+        public string amountOfOlderAndYoungerFriendsFeature(out string o_AmountOfYoungerFriends)
+        {
+            string amountOfOlderFriends = FacebookFriendsHandlerLogic.DisplayGeneralInformation(r_ConnectionManager.LoggedInUser,out o_AmountOfYoungerFriends);
+            return amountOfOlderFriends;
+        }
+
+        public FacebookObjectCollection<User> FriendsBornOnTheSameDateFeatue()
+        {
+            FacebookObjectCollection<User> friendsBornOnTheSameDate =
+               FacebookFriendsHandlerLogic.ExtractFriendsByBirthDate(r_ConnectionManager.LoggedInUser);
+            return friendsBornOnTheSameDate;
+        }
+
+        public FacebookObjectCollection<User> ExtractFriendsByCityFeatue()
+        {
+            FacebookObjectCollection<User> ExtractFriendsByCity =
+               FacebookFriendsHandlerLogic.ExtractFriendsByCity(r_ConnectionManager.LoggedInUser);
+            return ExtractFriendsByCity;
+        }
+
+
         public void Login()
         {
             if(!r_ConnectionManager.IsUserLoggedIn())
@@ -37,6 +91,8 @@ namespace BasicFacebookFeatures
                 throw new Exception("User is already logged in");
             }
         }
+
+        
 
         public void Logout()
         {

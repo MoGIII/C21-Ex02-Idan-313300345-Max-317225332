@@ -54,7 +54,7 @@
                 changeLabelVisible(m_ComponentToVisible, true);
                 FetchInitialData();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -62,7 +62,7 @@
 
         private void changeLabelVisible(List<Label> i_Labels, bool i_IsNeedToBeVisible)
         {
-            foreach(Label labelToVisible in i_Labels)
+            foreach (Label labelToVisible in i_Labels)
             {
                 labelToVisible.Visible = i_IsNeedToBeVisible;
             }
@@ -84,7 +84,7 @@
                 this.Controls.Clear();
                 this.InitializeComponent();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 MessageBox.Show(e.Message);
             }
@@ -92,50 +92,52 @@
 
         private void buttonFetchEvents_Click(object sender, EventArgs e)
         {
-            fetchFromUserData<Event>(listBoxOfEvents, "Events");
+            inputUserInformation<Event>(listBoxOfEvents, "Events");
         }
 
         private void buttonFetchGroups_Click(object sender, EventArgs e)
         {
-            fetchFromUserData<Group>(listBoxOfGroups, "Groups");
+            inputUserInformation<Group>(listBoxOfGroups, "Groups");
+        }
+
+        private void inputUserInformation<T>(ListBox i_ListBoxRequired, string i_TypeOfInformation)
+        {
+            FacebookObjectCollection<T> list;
+            list = m_FacebookFacade.GetUserInformation<FacebookObjectCollection<T>>(i_TypeOfInformation);
+            fetchListBox<T>(i_ListBoxRequired, list);
         }
 
         private void fetchPosts()
         {
-            if(r_Connection.IsUserLoggedIn())
+            FacebookObjectCollection<Post> posts;
+            posts = m_FacebookFacade.GetUserInformation<FacebookObjectCollection<Post>>("Posts");
+            listBoxOfPosts.Items.Clear();
+
+            foreach (Post post in posts)
             {
-                listBoxOfPosts.Items.Clear();
-
-                foreach(Post post in r_Connection.LoggedInUser.Posts)
+                if (post.Message != null)
                 {
-                    if(post.Message != null)
-                    {
-                        listBoxOfPosts.Items.Add(post.Message);
-                    }
-                    else if(post.Caption != null)
-                    {
-                        listBoxOfPosts.Items.Add(post.Caption);
-                    }
-                    else
-                    {
-                        listBoxOfPosts.Items.Add(string.Format("[{0}]", post.Type));
-                    }
+                    listBoxOfPosts.Items.Add(post.Message);
                 }
-
-                if(listBoxOfPosts.Items.Count == 0)
+                else if (post.Caption != null)
                 {
-                    MessageBox.Show("No Posts to retrieve :(");
+                    listBoxOfPosts.Items.Add(post.Caption);
+                }
+                else
+                {
+                    listBoxOfPosts.Items.Add(string.Format("[{0}]", post.Type));
                 }
             }
-            else
+
+            if (listBoxOfPosts.Items.Count == 0)
             {
-                MessageBox.Show("You need to connect to show the information");
+                MessageBox.Show("No Posts to retrieve :(");
             }
         }
 
         private void buttonFetchAlbum_Click(object sender, EventArgs e)
         {
-            fetchFromUserData<Album>(listBoxOfAlbum, "Albums");
+            inputUserInformation<Album>(listBoxOfAlbum, "Albums");
         }
 
         private void buttonFetchPost_Click(object sender, EventArgs e)
@@ -145,13 +147,14 @@
 
         private void ButtonCreatePost_Click(object sender, EventArgs e)
         {
-            createPost();
+            //createPost();
         }
 
+        /*
         private void createPost()
         {
             string postText = textBoxPostToCreate.Text;
-            if(!string.IsNullOrEmpty(postText) && r_Connection.IsUserLoggedIn())
+            if (!string.IsNullOrEmpty(postText) && r_Connection.IsUserLoggedIn())
             {
                 try
                 {
@@ -161,7 +164,7 @@
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(string.Format("Cannot upload Post!! {0} " ,e), "Error!");
+                    MessageBox.Show(string.Format("Cannot upload Post!! {0} ", e), "Error!");
                 }
                 finally
                 {
@@ -169,10 +172,10 @@
                 }
             }
         }
-
+        */
         private void ButtonFetchFriends_Click(object sender, EventArgs e)
         {
-            fetchFromUserData<User>(listBoxOfFriends, "Friends");
+            inputUserInformation<User>(listBoxOfFriends, "Friends");
         }
 
         private void ButtonPhotosFilter_Click(object sender, EventArgs e)
@@ -182,39 +185,33 @@
             labelDateOfPhoto.Text = string.Empty;
             labelNameOfAlbum.Text = string.Empty;
             labelLocation.Text = string.Empty;
-            if(r_Connection.IsUserLoggedIn() == true)
+            try
             {
-                try
+                if (radioButtonShowAllPhotos.Checked)
                 {
-                    FacebookObjectCollection<Album> userAlbums = r_Connection.LoggedInUser.Albums;
-                    if (radioButtonShowAllPhotos.Checked)
-                    {
-                        userPhotos = FacebookPhotosHandlerLogic.ExtractPhotosFromAlbum(userAlbums);
-                    }
-                    else if(radioButtonFilterByDate.Checked)
-                    {
-                        userPhotos = FacebookPhotosHandlerLogic.FilterPhotoByDate(userAlbums, dateTimePickerStartDate.Value, dateTimePickerEndDate.Value);
-                    }
-                    else if(radioButtonFilterByLocation.Checked)
-                    {
-                        userPhotos = FacebookPhotosHandlerLogic.FilterPhotoByLocation(userAlbums, textBoxLocation.Text);
-                    }
-                    else
-                    {
-                        throw new Exception("You need to choose one of options");
-                    }
 
-                    fetchListBox<Photo>(listBoxOfPhotos, userPhotos);
+                    userPhotos = m_FacebookFacade.FilterAllPhotosFeature();
                 }
-                catch (Exception ex)
+                else if (radioButtonFilterByDate.Checked)
                 {
-                    MessageBox.Show(ex.Message);
+                    userPhotos = m_FacebookFacade.FilterPhotosByDateFeature(dateTimePickerStartDate.Value, dateTimePickerEndDate.Value);
+                }
+                else if (radioButtonFilterByLocation.Checked)
+                {
+                    userPhotos = m_FacebookFacade.FilterPhotosByLocationFeature(textBoxLocation.Text);
+                }
+                else
+                {
+                    throw new Exception("You need to choose one of options");
                 }
             }
-            else
+            catch(Exception ex)
             {
-                MessageBox.Show("You need to login to see the information");
+                MessageBox.Show(ex.Message);
             }
+            
+
+            fetchListBox<Photo>(listBoxOfPhotos, userPhotos);
         }
 
         private void radioButtonFilterByLocation_CheckedChanged(object sender, EventArgs e)
@@ -269,51 +266,23 @@
             }
         }
 
-        private void fetchFromUserData<T>(ListBox i_ListBoxToFetch, string i_PropertyName)
-        {
-            if(r_Connection.IsUserLoggedIn())
-            {
-                try
-                {
-                    FacebookObjectCollection<T> dataToInsertDetails = (FacebookObjectCollection<T>)r_Connection.LoggedInUser.GetType()
-                        .GetProperty(i_PropertyName).GetValue(r_Connection.LoggedInUser, null);
-
-                    fetchListBox<T>(i_ListBoxToFetch, dataToInsertDetails);
-                }
-                catch
-                {
-                    MessageBox.Show(string.Format("Error!, cannot access the {0} of the user."), i_PropertyName);
-                }
-            }
-            else
-            {
-                MessageBox.Show("You need to connect to show the information");
-            }
-        }
-
         private void buttonCheckFriendsInfo_Click(object sender, EventArgs e)
         {
-            if (r_Connection.IsUserLoggedIn())
-            {
-                string amountOfOlderFriends = FacebookFriendsHandlerLogic.DisplayGeneralInformation(r_Connection.LoggedInUser, out string amountOfYoungerFriends);
-                FacebookObjectCollection<User> friendsBornOnTheSameDate =
-                    FacebookFriendsHandlerLogic.ExtractFriendsByBirthDate(r_Connection.LoggedInUser);
-                FacebookObjectCollection<User> friendsLiningInSameCity =
-                    FacebookFriendsHandlerLogic.ExtractFriendsByCity(r_Connection.LoggedInUser);
-                labelAmountOfOlderFriends.Text = amountOfOlderFriends;
-                labelAmountOfYoungerFriends.Text = amountOfYoungerFriends;
-                fetchListBox(listBoxOfFriendsLiveInSameCity, friendsLiningInSameCity);
-                fetchListBox(listBoxOfFriendsBornOnSameDate, friendsBornOnTheSameDate);
-            }
-            else
-            {
-                MessageBox.Show("You need to connect to show the information");
-            }
+            string amountOfYoungerFriends;
+            string amountOfOlderFriends = m_FacebookFacade.amountOfOlderAndYoungerFriendsFeature(out amountOfYoungerFriends);
+            FacebookObjectCollection<User> friendsBornOnTheSameDate =
+                m_FacebookFacade.FriendsBornOnTheSameDateFeatue();
+            FacebookObjectCollection<User> friendsLiningInSameCity =
+                m_FacebookFacade.ExtractFriendsByCityFeatue();
+            labelAmountOfOlderFriends.Text = amountOfOlderFriends;
+            labelAmountOfYoungerFriends.Text = amountOfYoungerFriends;
+            fetchListBox(listBoxOfFriendsLiveInSameCity, friendsLiningInSameCity);
+            fetchListBox(listBoxOfFriendsBornOnSameDate, friendsBornOnTheSameDate);
         }
 
         private void buttonFetchLikedPages_Click(object sender, EventArgs e)
         {
-            fetchFromUserData<Page>(listBoxOfPagesLiked, "LikedPages");
+            inputUserInformation<Page>(listBoxOfPagesLiked, "LikedPages");
         }
     }
 }
