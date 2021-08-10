@@ -83,6 +83,7 @@ namespace BasicFacebookFeatures
         public void Login()
         {
             m_ConnectionManager = FacebookConnectionMangerSingleton.Instance;
+            m_ConnectionManager.LoginToUser();
         }
 
         

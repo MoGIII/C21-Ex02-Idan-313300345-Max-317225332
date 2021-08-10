@@ -12,10 +12,7 @@
         public User LoggedInUser { get;private set; }
         public LoginResult LoginResult { get;private set; } = null;
 
-        private FacebookConnectionMangerSingleton()
-        {
-            LoginToUser();
-        }
+        private FacebookConnectionMangerSingleton() { }
 
         public static FacebookConnectionMangerSingleton Instance
         {
@@ -37,7 +34,7 @@
         }
     
 
-        private void LoginToUser()
+        public void LoginToUser()
         {
             if(!IsUserLoggedIn())
             {
