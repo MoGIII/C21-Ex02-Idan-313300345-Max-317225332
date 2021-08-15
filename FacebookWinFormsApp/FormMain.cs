@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Windows.Forms;
     using FacebookWrapper;
     using FacebookWrapper.ObjectModel;
@@ -24,7 +25,10 @@
         {
             string profilePictureUrl = m_FacebookFacade.GetUserInformation<string>("PictureNormalURL");
             // User profile picture:
-            pictureBoxProfilePhoto.LoadAsync(profilePictureUrl);
+            pictureBoxProfilePhoto.Invoke(new Action(() =>
+            {
+                pictureBoxProfilePhoto.LoadAsync(profilePictureUrl);
+            }));
         }
 
         private void buttonLogin_Click(object sender, EventArgs e)
@@ -92,12 +96,12 @@
 
         private void buttonFetchEvents_Click(object sender, EventArgs e)
         {
-            inputUserInformation<Event>(listBoxOfEvents, "Events");
+            new Thread(() => inputUserInformation<Event>(listBoxOfEvents, "Events")).Start();
         }
 
         private void buttonFetchGroups_Click(object sender, EventArgs e)
         {
-            inputUserInformation<Group>(listBoxOfGroups, "Groups");
+            new Thread(() => inputUserInformation<Group>(listBoxOfGroups, "Groups")).Start();
         }
 
         private void inputUserInformation<T>(ListBox i_ListBoxRequired, string i_TypeOfInformation)
@@ -107,42 +111,35 @@
             fetchListBox<T>(i_ListBoxRequired, list);
         }
 
+        private void fetchDataBinding<T>(BindingSource o_BindingSourchToFill, ListBox i_ListBoxSource,
+                                 FacebookObjectCollection<T> i_DataToInsert)
+        {
+            // check  cross-thread opertion:
+            if (!i_ListBoxSource.InvokeRequired)
+            {
+                o_BindingSourchToFill.DataSource = i_DataToInsert;
+            }
+            else
+            {
+                i_ListBoxSource.Invoke(new Action(() => o_BindingSourchToFill.DataSource = i_DataToInsert));
+            }
+        }
+
         private void fetchPosts()
         {
-            FacebookObjectCollection<Post> posts;
-            posts = m_FacebookFacade.GetUserInformation<FacebookObjectCollection<Post>>("Posts");
-            listBoxOfPosts.Items.Clear();
 
-            foreach (Post post in posts)
-            {
-                if (post.Message != null)
-                {
-                    listBoxOfPosts.Items.Add(post.Message);
-                }
-                else if (post.Caption != null)
-                {
-                    listBoxOfPosts.Items.Add(post.Caption);
-                }
-                else
-                {
-                    listBoxOfPosts.Items.Add(string.Format("[{0}]", post.Type));
-                }
-            }
-
-            if (listBoxOfPosts.Items.Count == 0)
-            {
-                MessageBox.Show("No Posts to retrieve :(");
-            }
+            FacebookObjectCollection<Post> userPosts = m_FacebookFacade.GetUserInformation<FacebookObjectCollection<Post>>("Posts");
+            fetchDataBinding<Post>(postBindingSource, listBoxOfPosts, userPosts);
         }
 
         private void buttonFetchAlbum_Click(object sender, EventArgs e)
         {
-            inputUserInformation<Album>(listBoxOfAlbum, "Albums");
+            new Thread(() => inputUserInformation<Album>(listBoxOfAlbum, "Albums")).Start();
         }
 
         private void buttonFetchPost_Click(object sender, EventArgs e)
         {
-            fetchPosts();
+            new Thread(fetchPosts).Start();
         }
 
         private void ButtonCreatePost_Click(object sender, EventArgs e)
@@ -175,10 +172,10 @@
         */
         private void ButtonFetchFriends_Click(object sender, EventArgs e)
         {
-            inputUserInformation<User>(listBoxOfFriends, "Friends");
+            new Thread(() => inputUserInformation<User>(listBoxOfFriends, "Friends")).Start();
         }
 
-        private void ButtonPhotosFilter_Click(object sender, EventArgs e)
+        private void filterPhotoByChooise()
         {
             FacebookObjectCollection<Photo> userPhotos = null;
             pictureBoxOfUserPhoto.Image = null;
@@ -205,13 +202,18 @@
                     throw new Exception("You need to choose one of options");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
-            
+
 
             fetchListBox<Photo>(listBoxOfPhotos, userPhotos);
+        }
+
+        private void ButtonPhotosFilter_Click(object sender, EventArgs e)
+        {
+            new Thread(filterPhotoByChooise).Start();
         }
 
         private void radioButtonFilterByLocation_CheckedChanged(object sender, EventArgs e)
