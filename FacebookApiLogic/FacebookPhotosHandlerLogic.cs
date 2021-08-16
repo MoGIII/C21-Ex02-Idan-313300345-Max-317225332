@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using FacebookWrapper.ObjectModel;
 
-    public static class FacebookPhotosHandlerLogic
+    internal static class FacebookPhotosHandlerLogic
     {
         public static FacebookObjectCollection<Photo> ExtractPhotosFromAlbum(FacebookObjectCollection<Album> i_Albums)
         {

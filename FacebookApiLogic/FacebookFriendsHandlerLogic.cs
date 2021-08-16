@@ -4,7 +4,7 @@
     using System.Globalization;
     using FacebookWrapper.ObjectModel;
 
-    public static class FacebookFriendsHandlerLogic
+    internal static class FacebookFriendsHandlerLogic
     {
         public static FacebookObjectCollection<User> ExtractFriendsByCity(User i_User)
         {

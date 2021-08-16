@@ -67,11 +67,8 @@
     <Reference Include="CefSharp.WinForms, Version=87.1.132.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=MSIL">
       <HintPath>..\packages\CefSharp.WinForms.87.1.132\lib\net452\CefSharp.WinForms.dll</HintPath>
     </Reference>
-    <Reference Include="Facebook">
-      <HintPath>..\..\..\..\..\Desktop\FBApi\Facebook.dll</HintPath>
-    </Reference>
     <Reference Include="FbGraphApiWrapper">
-      <HintPath>..\..\..\..\..\Desktop\FBApi\FbGraphApiWrapper.dll</HintPath>
+      <HintPath>..\..\..\..\..\C# Projects\test\FBApi\FbGraphApiWrapper.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.dll</HintPath>
@@ -89,10 +86,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FacebookApiFacade.cs" />
-    <Compile Include="FacebookConnectionMangerSingleton.cs" />
-    <Compile Include="FacebookPhotosHandlerLogic.cs" />
-    <Compile Include="FacebookFriendsHandlerLogic.cs" />
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -129,6 +122,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FacebookApiLogic\FacebookApiLogic.csproj">
+      <Project>{3ea94dc3-0e52-448e-9d69-3530c4e6d9c9}</Project>
+      <Name>FacebookApiLogic</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
