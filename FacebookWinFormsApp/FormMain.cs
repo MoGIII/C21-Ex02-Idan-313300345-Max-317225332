@@ -107,8 +107,11 @@
         private void inputUserInformation<T>(ListBox i_ListBoxRequired, string i_TypeOfInformation)
         {
             FacebookObjectCollection<T> list;
-            list = m_FacebookFacade.GetUserInformation<FacebookObjectCollection<T>>(i_TypeOfInformation);
-            fetchListBox<T>(i_ListBoxRequired, list);
+            
+            i_ListBoxRequired.Invoke(new Action(() => {
+                    list = m_FacebookFacade.GetUserInformation<FacebookObjectCollection<T>>(i_TypeOfInformation);
+                    fetchListBox<T>(i_ListBoxRequired, list); 
+                }));
         }
 
         private void fetchDataBinding<T>(BindingSource o_BindingSourchToFill, ListBox i_ListBoxSource,
@@ -129,7 +132,9 @@
         {
 
             FacebookObjectCollection<Post> userPosts = m_FacebookFacade.GetUserInformation<FacebookObjectCollection<Post>>("Posts");
-            fetchDataBinding<Post>(postBindingSource, listBoxOfPosts, userPosts);
+
+            listBoxOfPosts.Invoke(
+                new Action(() => fetchDataBinding<Post>(postBindingSource, listBoxOfPosts, userPosts)));
         }
 
         private void buttonFetchAlbum_Click(object sender, EventArgs e)
@@ -207,8 +212,7 @@
                 MessageBox.Show(ex.Message);
             }
 
-
-            fetchListBox<Photo>(listBoxOfPhotos, userPhotos);
+            listBoxOfPhotos.Invoke(new Action(() => fetchListBox<Photo>(listBoxOfPhotos, userPhotos)));
         }
 
         private void ButtonPhotosFilter_Click(object sender, EventArgs e)
