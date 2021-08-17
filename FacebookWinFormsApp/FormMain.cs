@@ -274,8 +274,8 @@
 
         private void buttonCheckFriendsInfo_Click(object sender, EventArgs e)
         {
-            string amountOfYoungerFriends;
-            string amountOfOlderFriends = m_FacebookFacade.amountOfOlderAndYoungerFriendsFeature(out amountOfYoungerFriends);
+            string amountOfYoungerFriends = null;
+            string amountOfOlderFriends = m_FacebookFacade.amountOfOlderAndYoungerFriendsFeature(amountOfYoungerFriends);
             FacebookObjectCollection<User> friendsBornOnTheSameDate =
                 m_FacebookFacade.FriendsBornOnTheSameDateFeatue();
             FacebookObjectCollection<User> friendsLiningInSameCity =

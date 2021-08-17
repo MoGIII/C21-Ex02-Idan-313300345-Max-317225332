@@ -2,19 +2,27 @@
 {
     using System;
     using System.Globalization;
+    using FacebookApiLogic;
     using FacebookWrapper.ObjectModel;
 
-    internal static class FacebookFriendsHandlerLogic
+    public class FacebookFriendsHandlerLogic : IFacebookFriendsHandler
     {
-        public static FacebookObjectCollection<User> ExtractFriendsByCity(User i_User)
+        private readonly User r_LoggedUser;
+
+        public FacebookFriendsHandlerLogic(User i_User)
+        {
+            r_LoggedUser = i_User;
+        }
+
+        public FacebookObjectCollection<User> ExtractFriendsByCity()
         {
             FacebookObjectCollection<User> listBoxOfFriendsOfSameCity = new FacebookObjectCollection<User>();
 
-            foreach(User user in i_User.Friends)
+            foreach (User user in r_LoggedUser.Friends)
             {
-                if(user.Location != null)
+                if (user.Location != null)
                 {
-                    if(user.Location.Name.Equals(i_User.Location.Name))
+                    if (user.Location.Name.Equals(r_LoggedUser.Location.Name))
                     {
                         listBoxOfFriendsOfSameCity.Add(user);
                     }
@@ -24,15 +32,16 @@
             return listBoxOfFriendsOfSameCity;
         }
 
-        public static FacebookObjectCollection<User> ExtractFriendsByBirthDate(User i_User)
+
+        public FacebookObjectCollection<User> ExtractFriendsByBirthDate()
         {
             FacebookObjectCollection<User> listBoxOfFriendsOfSameBirthday = new FacebookObjectCollection<User>();
 
-            foreach(User user in i_User.Friends)
+            foreach (User user in r_LoggedUser.Friends)
             {
-                if(!user.Birthday.Equals(string.Empty))
+                if (!user.Birthday.Equals(string.Empty))
                 {
-                    if(user.Birthday.Equals(i_User.Birthday))
+                    if (user.Birthday.Equals(r_LoggedUser.Birthday))
                     {
                         listBoxOfFriendsOfSameBirthday.Add(user);
                     }
@@ -42,25 +51,25 @@
             return listBoxOfFriendsOfSameBirthday;
         }
 
-        public static string DisplayGeneralInformation(User i_User, out string o_AmountOfYoungerFriendsCount)
+        public string DisplayGeneralInformation(string o_AmountOfYoungerFriendsCount)
         {
-            string amountOfOlderFriends = fetchFriendsAgeCounts(i_User, out o_AmountOfYoungerFriendsCount);
+            string amountOfOlderFriends = fetchFriendsAgeCounts(o_AmountOfYoungerFriendsCount);
 
             return amountOfOlderFriends;
         }
 
-        private static string fetchFriendsAgeCounts(User i_User, out string o_AmountOfYoungerFriendsCount)
+        public string fetchFriendsAgeCounts(string o_AmountOfYoungerFriendsCount)
         {
             int olderFriendsAmount = 0;
             int youngerFriendsAmount = 0;
             const string k_DatePattern = "MM/dd/yyyy";
 
-            foreach(User friend in i_User.Friends)
+            foreach(User friend in r_LoggedUser.Friends)
             {
-                if(!(friend.Birthday.Equals(string.Empty) && i_User.Birthday.Equals(string.Empty)))
+                if(!(friend.Birthday.Equals(string.Empty) && r_LoggedUser.Birthday.Equals(string.Empty)))
                 {
                     DateTime friendsBirthday = DateTime.ParseExact(friend.Birthday, k_DatePattern, CultureInfo.InvariantCulture);
-                    DateTime usersBirthday = DateTime.ParseExact(i_User.Birthday, k_DatePattern, CultureInfo.InvariantCulture);
+                    DateTime usersBirthday = DateTime.ParseExact(r_LoggedUser.Birthday, k_DatePattern, CultureInfo.InvariantCulture);
                     if(friendsBirthday > usersBirthday)
                     {
                         youngerFriendsAmount++;
@@ -75,6 +84,11 @@
 
             o_AmountOfYoungerFriendsCount = youngerFriendsAmount.ToString();
             return olderFriendsAmount.ToString();
+        }
+
+        public DateTime? LastTimeUpdateDate()
+        {
+            return r_LoggedUser.UpdateTime;
         }
     }
 }

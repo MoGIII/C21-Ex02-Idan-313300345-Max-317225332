@@ -1,4 +1,5 @@
 ﻿using System;
+using FacebookApiLogic;
 using FacebookWrapper.ObjectModel;
 
 namespace BasicFacebookFeatures
@@ -7,6 +8,7 @@ namespace BasicFacebookFeatures
 
     {
         private FacebookConnectionMangerSingleton m_ConnectionManager = null;
+        private IFacebookFriendsHandler m_FriendsHandler;
 
         public T GetUserInformation<T>(string i_PropertyToCheck)
             where T : class
@@ -58,23 +60,23 @@ namespace BasicFacebookFeatures
             return photos;
         }
 
-        public string amountOfOlderAndYoungerFriendsFeature(out string o_AmountOfYoungerFriends)
+        public string amountOfOlderAndYoungerFriendsFeature(string o_AmountOfYoungerFriends)
         {
-            string amountOfOlderFriends = FacebookFriendsHandlerLogic.DisplayGeneralInformation(m_ConnectionManager.LoggedInUser,out o_AmountOfYoungerFriends);
+            string amountOfOlderFriends = m_FriendsHandler.DisplayGeneralInformation(o_AmountOfYoungerFriends);
             return amountOfOlderFriends;
         }
 
         public FacebookObjectCollection<User> FriendsBornOnTheSameDateFeatue()
         {
             FacebookObjectCollection<User> friendsBornOnTheSameDate =
-               FacebookFriendsHandlerLogic.ExtractFriendsByBirthDate(m_ConnectionManager.LoggedInUser);
+               m_FriendsHandler.ExtractFriendsByBirthDate();
             return friendsBornOnTheSameDate;
         }
 
         public FacebookObjectCollection<User> ExtractFriendsByCityFeatue()
         {
             FacebookObjectCollection<User> ExtractFriendsByCity =
-               FacebookFriendsHandlerLogic.ExtractFriendsByCity(m_ConnectionManager.LoggedInUser);
+               m_FriendsHandler.ExtractFriendsByCity();
             return ExtractFriendsByCity;
         }
 
@@ -83,6 +85,7 @@ namespace BasicFacebookFeatures
         {
             m_ConnectionManager = FacebookConnectionMangerSingleton.Instance;
             m_ConnectionManager.LoginToUser();
+            m_FriendsHandler = new CachingFriendsHandler(m_ConnectionManager.LoggedInUser);
         }
 
         

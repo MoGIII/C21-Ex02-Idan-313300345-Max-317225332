@@ -6,10 +6,10 @@
 
   <ItemGroup>
     <Reference Include="Facebook">
-      <HintPath>..\..\..\..\..\C# Projects\test\FBApi\Facebook.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\FBApi\Facebook.dll</HintPath>
     </Reference>
     <Reference Include="FbGraphApiWrapper">
-      <HintPath>..\..\..\..\..\C# Projects\test\FBApi\FbGraphApiWrapper.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\FBApi\FbGraphApiWrapper.dll</HintPath>
     </Reference>
   </ItemGroup>
 
