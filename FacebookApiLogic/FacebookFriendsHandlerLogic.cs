@@ -70,7 +70,6 @@ namespace FacebookApiLogic
 
         public string FetchFriendsAgeCounts()
         {
-            //int olderFriendsAmount = 0;
             int youngerFriendsAmount = 0;
             const string k_DatePattern = "MM/dd/yyyy";
 
@@ -84,15 +83,8 @@ namespace FacebookApiLogic
                     {
                         youngerFriendsAmount++;
                     }
-
-                    //if(friendsBirthday < usersBirthday)
-                    //{
-                    //    olderFriendsAmount++;
-                    //}
                 }
             }
-
-            //i_AmountOfYoungerFriendsCount = youngerFriendsAmount.ToString();
             return youngerFriendsAmount.ToString();
         }
 

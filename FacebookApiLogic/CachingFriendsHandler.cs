@@ -57,16 +57,17 @@ namespace FacebookApiLogic
                                                              FacebookFriendsHandlerStringDelegate i_FacebookFriendsDelegate,
                                                              ref string i_IoCachedData)
         {
+            string returnedData = String.Empty;
             // check first use or if we have the most updated data:
             if (i_IoCachedData == null || i_IoLastCachingDate < r_FriendsHandlerLogic.LastTimeUpdateDate())
             {
-                i_IoCachedData = i_FacebookFriendsDelegate(ref i_IoCachedData);
+                returnedData = i_FacebookFriendsDelegate(ref i_IoCachedData);
             }
 
             // update the last caching date:
             m_LastTimeUpdateFriendsCaching = DateTime.Now;
 
-            return i_IoCachedData;
+            return returnedData;
         }
 
         public string FetchFriendsAgeCounts(ref string i_IoCachedData)
@@ -78,11 +79,11 @@ namespace FacebookApiLogic
 
         public string DisplayGeneralInformation(ref string i_AmountOfYoungerFriendsCount)
         {
-            r_FriendsHandlerLogic.BirthdayCheckingStrategy = new CheckOlderFriendsStrategy();
-            string amountOfOlderFriends = FetchFriendsAgeCounts(ref m_OlderFriendsCount);
-            r_FriendsHandlerLogic.BirthdayCheckingStrategy = new CheckYoungerFriendsStrategy();
-            i_AmountOfYoungerFriendsCount = FetchFriendsAgeCounts(ref m_YoungerFriendsCount);
-            return amountOfOlderFriends;
+            //r_FriendsHandlerLogic.BirthdayCheckingStrategy = new CheckOlderFriendsStrategy();
+            m_OlderFriendsCount = FetchFriendsAgeCounts(ref i_AmountOfYoungerFriendsCount);
+            //r_FriendsHandlerLogic.BirthdayCheckingStrategy = new CheckYoungerFriendsStrategy();
+            //i_AmountOfYoungerFriendsCount = FetchFriendsAgeCounts(ref m_YoungerFriendsCount);
+            return m_OlderFriendsCount;
         }
     }
 }

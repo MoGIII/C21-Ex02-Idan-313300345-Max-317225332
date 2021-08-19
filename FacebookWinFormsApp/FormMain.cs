@@ -98,55 +98,99 @@ namespace BasicFacebookFeatures
 
         private void buttonFetchEvents_Click(object i_Sender, EventArgs i_)
         {
-            new Thread(() => inputUserInformation<Event>(listBoxOfEvents, "Events")).Start();
+            try
+            {
+                new Thread(() => inputUserInformation<Event>(listBoxOfEvents, "Events")).Start();
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+            
         }
 
         private void buttonFetchGroups_Click(object i_Sender, EventArgs i_)
         {
-            new Thread(() => inputUserInformation<Group>(listBoxOfGroups, "Groups")).Start();
+            try
+            {
+                new Thread(() => inputUserInformation<Group>(listBoxOfGroups, "Groups")).Start();
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+            
         }
 
         private void inputUserInformation<T>(ListBox i_ListBoxRequired, string i_TypeOfInformation)
         {
-            FacebookObjectCollection<T> list;
+            try
+            {
+                FacebookObjectCollection<T> list;
+                i_ListBoxRequired.Invoke(new Action(() => {
+                        list = m_FacebookFacade.GetUserInformation<FacebookObjectCollection<T>>(i_TypeOfInformation);
+                        fetchListBox<T>(i_ListBoxRequired, list);
+                    }));
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
             
-            i_ListBoxRequired.Invoke(new Action(() => {
-                    list = m_FacebookFacade.GetUserInformation<FacebookObjectCollection<T>>(i_TypeOfInformation);
-                    fetchListBox<T>(i_ListBoxRequired, list); 
-                }));
         }
 
         private void fetchDataBinding<T>(BindingSource i_OBindingSourchToFill, ListBox i_ListBoxSource,
                                  FacebookObjectCollection<T> i_DataToInsert)
         {
-            // check  cross-thread opertion:
-            if (!i_ListBoxSource.InvokeRequired)
+            if(i_DataToInsert != null)
             {
-                i_OBindingSourchToFill.DataSource = i_DataToInsert;
+                i_ListBoxSource.Invoke(new Action(() => i_OBindingSourchToFill.DataSource = i_DataToInsert));
             }
             else
             {
-                i_ListBoxSource.Invoke(new Action(() => i_OBindingSourchToFill.DataSource = i_DataToInsert));
+                MessageBox.Show("No posts to retrieve :(");
             }
         }
 
         private void fetchPosts()
         {
+            try
+            {
+                FacebookObjectCollection<Post> userPosts = m_FacebookFacade.GetUserInformation<FacebookObjectCollection<Post>>("Posts");
 
-            FacebookObjectCollection<Post> userPosts = m_FacebookFacade.GetUserInformation<FacebookObjectCollection<Post>>("Posts");
-
-            listBoxOfPosts.Invoke(
-                new Action(() => fetchDataBinding<Post>(postBindingSource, listBoxOfPosts, userPosts)));
+                listBoxOfPosts.Invoke(
+                    new Action(() => fetchDataBinding<Post>(postBindingSource, listBoxOfPosts, userPosts)));
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+            
         }
 
         private void buttonFetchAlbum_Click(object i_Sender, EventArgs i_)
         {
-            new Thread(() => inputUserInformation<Album>(listBoxOfAlbum, "Albums")).Start();
+            try
+            {
+                new Thread(() => inputUserInformation<Album>(listBoxOfAlbum, "Albums")).Start();
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
         }
 
         private void buttonFetchPost_Click(object i_Sender, EventArgs i_)
         {
-            new Thread(fetchPosts).Start();
+            try
+            {
+                new Thread(fetchPosts).Start();
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+            
         }
 
         private void ButtonCreatePost_Click(object i_Sender, EventArgs i_)
@@ -179,7 +223,15 @@ namespace BasicFacebookFeatures
         */
         private void ButtonFetchFriends_Click(object i_Sender, EventArgs i_)
         {
-            new Thread(() => inputUserInformation<User>(listBoxOfFriends, "Friends")).Start();
+            try
+            {
+                new Thread(() => inputUserInformation<User>(listBoxOfFriends, "Friends")).Start();
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+            
         }
 
         private void filterPhotoByChooise()
@@ -208,13 +260,13 @@ namespace BasicFacebookFeatures
                 {
                     throw new Exception("You need to choose one of options");
                 }
+                listBoxOfPhotos.Invoke(new Action(() => fetchListBox<Photo>(listBoxOfPhotos, userPhotos)));
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
 
-            listBoxOfPhotos.Invoke(new Action(() => fetchListBox<Photo>(listBoxOfPhotos, userPhotos)));
         }
 
         private void ButtonPhotosFilter_Click(object i_Sender, EventArgs i_)
@@ -235,29 +287,37 @@ namespace BasicFacebookFeatures
 
         private void ListBoxOfPhotos_SelectedIndexChanged(object i_Sender, EventArgs i_)
         {
-            Photo currentPhoto = listBoxOfPhotos.SelectedItem as Photo;
-
-            if(currentPhoto != null)
+            try
             {
-                labelNameOfAlbum.Text = currentPhoto.Album.Name;
-                labelDateOfPhoto.Text = currentPhoto.CreatedTime.ToString();
-                if(currentPhoto.Place != null)
-                {
-                    labelLocation.Text = currentPhoto.Place.Name;
-                }
-                else
-                {
-                    labelLocation.Text = string.Empty;
-                }
+                Photo currentPhoto = listBoxOfPhotos.SelectedItem as Photo;
 
-                pictureBoxOfUserPhoto.LoadAsync(currentPhoto.PictureNormalURL);
+                if (currentPhoto != null)
+                {
+                    labelNameOfAlbum.Text = currentPhoto.Album.Name;
+                    labelDateOfPhoto.Text = currentPhoto.CreatedTime.ToString();
+                    if (currentPhoto.Place != null)
+                    {
+                        labelLocation.Text = currentPhoto.Place.Name;
+                    }
+                    else
+                    {
+                        labelLocation.Text = string.Empty;
+                    }
+
+                    pictureBoxOfUserPhoto.LoadAsync(currentPhoto.PictureNormalURL);
+                }
             }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+            
         }
 
         private void fetchListBox<T>(ListBox i_ListBoxToFetch, FacebookObjectCollection<T> i_DataToInsert)
         {
             i_ListBoxToFetch.Items.Clear();
-            if(i_DataToInsert.Count > 0)
+            if(i_DataToInsert != null && i_DataToInsert.Count > 0)
             {
                 foreach(T itemInCollection in i_DataToInsert)
                 {
@@ -274,23 +334,40 @@ namespace BasicFacebookFeatures
             }
         }
 
-        private void buttonCheckFriendsInfo_Click(object i_Sender, EventArgs i_)
+        private void buttonCheckFriendsInfo_Click(object i_Sender, EventArgs i_EventArgs)
         {
-            string amountOfYoungerFriends = "0";
-            string amountOfOlderFriends = m_FacebookFacade.AmountOfOlderAndYoungerFriendsFeature(ref amountOfYoungerFriends);
-            FacebookObjectCollection<User> friendsBornOnTheSameDate =
-                m_FacebookFacade.FriendsBornOnTheSameDateFeature();
-            FacebookObjectCollection<User> friendsLiningInSameCity =
-                m_FacebookFacade.ExtractFriendsByCityFeature();
-            labelAmountOfOlderFriends.Text = amountOfOlderFriends;
-            labelAmountOfYoungerFriends.Text = amountOfYoungerFriends;
-            fetchListBox(listBoxOfFriendsLiveInSameCity, friendsLiningInSameCity);
-            fetchListBox(listBoxOfFriendsBornOnSameDate, friendsBornOnTheSameDate);
+            
+            try
+            {
+                string amountOfYoungerFriends = "0";
+                string amountOfOlderFriends =
+                    m_FacebookFacade.AmountOfOlderAndYoungerFriendsFeature(ref amountOfYoungerFriends);
+                FacebookObjectCollection<User> friendsBornOnTheSameDate =
+                    m_FacebookFacade.FriendsBornOnTheSameDateFeature();
+                FacebookObjectCollection<User> friendsLiningInSameCity = m_FacebookFacade.ExtractFriendsByCityFeature();
+                labelAmountOfOlderFriends.Text = amountOfOlderFriends;
+                labelAmountOfYoungerFriends.Text = amountOfYoungerFriends;
+                fetchListBox(listBoxOfFriendsLiveInSameCity, friendsLiningInSameCity);
+                fetchListBox(listBoxOfFriendsBornOnSameDate, friendsBornOnTheSameDate);
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
         }
 
         private void buttonFetchLikedPages_Click(object i_Sender, EventArgs i_)
         {
-            inputUserInformation<Page>(listBoxOfPagesLiked, "LikedPages");
+            try
+            {
+                inputUserInformation<Page>(listBoxOfPagesLiked, "LikedPages");
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+            
         }
+
     }
 }
