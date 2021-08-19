@@ -1,8 +1,7 @@
 ﻿using System;
-using FacebookApiLogic;
 using FacebookWrapper.ObjectModel;
 
-namespace BasicFacebookFeatures
+namespace FacebookApiLogic
 {
     public class FacebookApiFacade
 
@@ -13,11 +12,10 @@ namespace BasicFacebookFeatures
         public T GetUserInformation<T>(string i_PropertyToCheck)
             where T : class
         {
-            T objectToReturn = null;
+            T objectToReturn;
             if(m_ConnectionManager.IsUserLoggedIn())
             {
-                objectToReturn = (T)m_ConnectionManager.LoggedInUser.GetType().GetProperty(i_PropertyToCheck)
-                    .GetValue(m_ConnectionManager.LoggedInUser, null);
+                objectToReturn = (T)m_ConnectionManager.LoggedInUser.GetType().GetProperty(i_PropertyToCheck)?.GetValue(m_ConnectionManager.LoggedInUser, null);
 
             }
             else
@@ -60,24 +58,24 @@ namespace BasicFacebookFeatures
             return photos;
         }
 
-        public string amountOfOlderAndYoungerFriendsFeature(string o_AmountOfYoungerFriends)
+        public string AmountOfOlderAndYoungerFriendsFeature(ref string i_OAmountOfYoungerFriends)
         {
-            string amountOfOlderFriends = m_FriendsHandler.DisplayGeneralInformation(o_AmountOfYoungerFriends);
+            string amountOfOlderFriends = m_FriendsHandler.DisplayGeneralInformation(ref i_OAmountOfYoungerFriends);
             return amountOfOlderFriends;
         }
 
-        public FacebookObjectCollection<User> FriendsBornOnTheSameDateFeatue()
+        public FacebookObjectCollection<User> FriendsBornOnTheSameDateFeature()
         {
             FacebookObjectCollection<User> friendsBornOnTheSameDate =
                m_FriendsHandler.ExtractFriendsByBirthDate();
             return friendsBornOnTheSameDate;
         }
 
-        public FacebookObjectCollection<User> ExtractFriendsByCityFeatue()
+        public FacebookObjectCollection<User> ExtractFriendsByCityFeature()
         {
-            FacebookObjectCollection<User> ExtractFriendsByCity =
+            FacebookObjectCollection<User> extractFriendsByCity =
                m_FriendsHandler.ExtractFriendsByCity();
-            return ExtractFriendsByCity;
+            return extractFriendsByCity;
         }
 
 

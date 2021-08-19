@@ -1,86 +1,87 @@
-﻿using FacebookApiLogic;
+﻿using System;
 using FacebookWrapper.ObjectModel;
-using System;
-using System.Globalization;
 
-namespace BasicFacebookFeatures
+namespace FacebookApiLogic
 {
     internal class CachingFriendsHandler : IFacebookFriendsHandler
     {
         private delegate FacebookObjectCollection<T> FacebookFriendsHandlerDelegate<T>();
-        private delegate string FacebookFriendsHandlerStringDelegate(string inString);
+        private delegate string FacebookFriendsHandlerStringDelegate(ref string i_Data);
         // caching dates:
         private DateTime m_LastTimeUpdateFriendsCaching;
         // real subject:
-        private FacebookFriendsHandlerLogic m_FriendsHandlerLogic;
+        private readonly FacebookFriendsHandlerLogic r_FriendsHandlerLogic;
         // cache data:
-        private FacebookObjectCollection<User> m_FriendsSameCity = null;
-        private FacebookObjectCollection<User> m_FriendsDate = null;
+        private FacebookObjectCollection<User> m_FriendsSameCity;
+        private FacebookObjectCollection<User> m_FriendsDate;
         private string m_OlderFriendsCount;
-        private string m_YongerFriendsCount;
+        private string m_YoungerFriendsCount;
 
         public CachingFriendsHandler(User i_User)
         {
-            m_FriendsHandlerLogic = new FacebookFriendsHandlerLogic(i_User);
+
+            r_FriendsHandlerLogic = new FacebookFriendsHandlerLogic(i_User);
         }
 
         public FacebookObjectCollection<User> ExtractFriendsByCity()
         {
             return getAndUpdateCacheData<User>(ref m_LastTimeUpdateFriendsCaching,
-                m_FriendsHandlerLogic.ExtractFriendsByCity,
+                r_FriendsHandlerLogic.ExtractFriendsByCity,
                 ref m_FriendsSameCity);
         }
         public FacebookObjectCollection<User> ExtractFriendsByBirthDate()
         {
             return getAndUpdateCacheData<User>(ref m_LastTimeUpdateFriendsCaching,
-           m_FriendsHandlerLogic.ExtractFriendsByBirthDate,
+           r_FriendsHandlerLogic.ExtractFriendsByBirthDate,
            ref m_FriendsDate);
         }
 
 
-        private FacebookObjectCollection<T> getAndUpdateCacheData<T>(ref DateTime io_LastCachingDate,
+        private FacebookObjectCollection<T> getAndUpdateCacheData<T>(ref DateTime i_IoLastCachingDate,
                                                              FacebookFriendsHandlerDelegate<T> i_FacebookFriendsDelegate,
-                                                             ref FacebookObjectCollection<T> io_CachedData)
+                                                             ref FacebookObjectCollection<T> i_IoCachedData)
         {
             // check first use or if we have the most updated data:
-            if (io_CachedData == null || io_LastCachingDate < m_FriendsHandlerLogic.LastTimeUpdateDate())
+            if (i_IoCachedData == null || i_IoLastCachingDate < r_FriendsHandlerLogic.LastTimeUpdateDate())
             {
-                io_CachedData = i_FacebookFriendsDelegate();
+                i_IoCachedData = i_FacebookFriendsDelegate();
             }
 
             // update the last caching date:
             m_LastTimeUpdateFriendsCaching = DateTime.Now;
 
-            return io_CachedData;
+            return i_IoCachedData;
         }
 
-        private string getAndUpdateCacheDataString(ref DateTime io_LastCachingDate,
+        private string getAndUpdateCacheDataString(ref DateTime i_IoLastCachingDate,
                                                              FacebookFriendsHandlerStringDelegate i_FacebookFriendsDelegate,
-                                                             ref string io_CachedData)
+                                                             ref string i_IoCachedData)
         {
             // check first use or if we have the most updated data:
-            if (io_CachedData == null || io_LastCachingDate < m_FriendsHandlerLogic.LastTimeUpdateDate())
+            if (i_IoCachedData == null || i_IoLastCachingDate < r_FriendsHandlerLogic.LastTimeUpdateDate())
             {
-                io_CachedData = i_FacebookFriendsDelegate(io_CachedData);
+                i_IoCachedData = i_FacebookFriendsDelegate(ref i_IoCachedData);
             }
 
             // update the last caching date:
             m_LastTimeUpdateFriendsCaching = DateTime.Now;
 
-            return io_CachedData;
+            return i_IoCachedData;
         }
 
-        public string fetchFriendsAgeCounts(string o_AmountOfYoungerFriendsCount)
+        public string FetchFriendsAgeCounts(ref string i_IoCachedData)
         {
             return getAndUpdateCacheDataString(ref m_LastTimeUpdateFriendsCaching,
-           m_FriendsHandlerLogic.fetchFriendsAgeCounts,
-           ref m_YongerFriendsCount);
+           r_FriendsHandlerLogic.FetchFriendsAgeCounts,
+           ref i_IoCachedData);
         }
 
-        public string DisplayGeneralInformation(string o_AmountOfYoungerFriendsCount)
+        public string DisplayGeneralInformation(ref string i_AmountOfYoungerFriendsCount)
         {
-            string amountOfOlderFriends = fetchFriendsAgeCounts(m_YongerFriendsCount);
-
+            r_FriendsHandlerLogic.BirthdayCheckingStrategy = new CheckOlderFriendsStrategy();
+            string amountOfOlderFriends = FetchFriendsAgeCounts(ref m_OlderFriendsCount);
+            r_FriendsHandlerLogic.BirthdayCheckingStrategy = new CheckYoungerFriendsStrategy();
+            i_AmountOfYoungerFriendsCount = FetchFriendsAgeCounts(ref m_YoungerFriendsCount);
             return amountOfOlderFriends;
         }
     }

@@ -11,7 +11,8 @@ namespace FacebookApiLogic
     {
         FacebookObjectCollection<User> ExtractFriendsByCity();
         FacebookObjectCollection<User> ExtractFriendsByBirthDate();
-        string fetchFriendsAgeCounts(string o_AmountOfYoungerFriendsCount);
-        string DisplayGeneralInformation(string o_AmountOfYoungerFriendsCount);
+        string FetchFriendsAgeCounts(ref string i_AmountOfYoungerFriendsCount);
+
+        string DisplayGeneralInformation(ref string i_AmountOfYoungerFriendsCount);
     }
 }

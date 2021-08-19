@@ -1,9 +1,9 @@
-﻿namespace BasicFacebookFeatures
-{
-    using System;
-    using System.Collections.Generic;
-    using FacebookWrapper.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using FacebookWrapper.ObjectModel;
 
+namespace FacebookApiLogic
+{
     internal static class FacebookPhotosHandlerLogic
     {
         public static FacebookObjectCollection<Photo> ExtractPhotosFromAlbum(FacebookObjectCollection<Album> i_Albums)
@@ -46,16 +46,16 @@
             return photoFilterByDate;
         }
 
-        public static string RemoveSpecialChar(string str)
+        public static string RemoveSpecialChar(string i_StringToRemoveSpecialCharsFrom)
         {
             List<char> charToRemove = new List<char>() { '\u200E', '\u200F' };
 
             foreach(char c in charToRemove)
             {
-                str = str.Replace(c.ToString(), string.Empty);
+                i_StringToRemoveSpecialCharsFrom = i_StringToRemoveSpecialCharsFrom.Replace(c.ToString(), string.Empty);
             }
 
-            return str;
+            return i_StringToRemoveSpecialCharsFrom;
         }
 
         public static FacebookObjectCollection<Photo> FilterPhotoByLocation(FacebookObjectCollection<Album> i_Albums, string i_Location)

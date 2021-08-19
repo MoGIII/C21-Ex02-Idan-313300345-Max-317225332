@@ -1,4 +1,6 @@
-﻿namespace BasicFacebookFeatures
+﻿using FacebookApiLogic;
+
+namespace BasicFacebookFeatures
 {
     using System;
     using System.Collections.Generic;
@@ -31,7 +33,7 @@
             }));
         }
 
-        private void buttonLogin_Click(object sender, EventArgs e)
+        private void buttonLogin_Click(object i_Sender, EventArgs i_)
         {
             loginAndInitApp();
         }
@@ -72,7 +74,7 @@
             }
         }
 
-        private void buttonLogout_Click(object sender, EventArgs e)
+        private void buttonLogout_Click(object i_Sender, EventArgs i_)
         {
             logoutUser();
         }
@@ -94,12 +96,12 @@
             }
         }
 
-        private void buttonFetchEvents_Click(object sender, EventArgs e)
+        private void buttonFetchEvents_Click(object i_Sender, EventArgs i_)
         {
             new Thread(() => inputUserInformation<Event>(listBoxOfEvents, "Events")).Start();
         }
 
-        private void buttonFetchGroups_Click(object sender, EventArgs e)
+        private void buttonFetchGroups_Click(object i_Sender, EventArgs i_)
         {
             new Thread(() => inputUserInformation<Group>(listBoxOfGroups, "Groups")).Start();
         }
@@ -114,17 +116,17 @@
                 }));
         }
 
-        private void fetchDataBinding<T>(BindingSource o_BindingSourchToFill, ListBox i_ListBoxSource,
+        private void fetchDataBinding<T>(BindingSource i_OBindingSourchToFill, ListBox i_ListBoxSource,
                                  FacebookObjectCollection<T> i_DataToInsert)
         {
             // check  cross-thread opertion:
             if (!i_ListBoxSource.InvokeRequired)
             {
-                o_BindingSourchToFill.DataSource = i_DataToInsert;
+                i_OBindingSourchToFill.DataSource = i_DataToInsert;
             }
             else
             {
-                i_ListBoxSource.Invoke(new Action(() => o_BindingSourchToFill.DataSource = i_DataToInsert));
+                i_ListBoxSource.Invoke(new Action(() => i_OBindingSourchToFill.DataSource = i_DataToInsert));
             }
         }
 
@@ -137,17 +139,17 @@
                 new Action(() => fetchDataBinding<Post>(postBindingSource, listBoxOfPosts, userPosts)));
         }
 
-        private void buttonFetchAlbum_Click(object sender, EventArgs e)
+        private void buttonFetchAlbum_Click(object i_Sender, EventArgs i_)
         {
             new Thread(() => inputUserInformation<Album>(listBoxOfAlbum, "Albums")).Start();
         }
 
-        private void buttonFetchPost_Click(object sender, EventArgs e)
+        private void buttonFetchPost_Click(object i_Sender, EventArgs i_)
         {
             new Thread(fetchPosts).Start();
         }
 
-        private void ButtonCreatePost_Click(object sender, EventArgs e)
+        private void ButtonCreatePost_Click(object i_Sender, EventArgs i_)
         {
             //createPost();
         }
@@ -175,7 +177,7 @@
             }
         }
         */
-        private void ButtonFetchFriends_Click(object sender, EventArgs e)
+        private void ButtonFetchFriends_Click(object i_Sender, EventArgs i_)
         {
             new Thread(() => inputUserInformation<User>(listBoxOfFriends, "Friends")).Start();
         }
@@ -215,23 +217,23 @@
             listBoxOfPhotos.Invoke(new Action(() => fetchListBox<Photo>(listBoxOfPhotos, userPhotos)));
         }
 
-        private void ButtonPhotosFilter_Click(object sender, EventArgs e)
+        private void ButtonPhotosFilter_Click(object i_Sender, EventArgs i_)
         {
             new Thread(filterPhotoByChooise).Start();
         }
 
-        private void radioButtonFilterByLocation_CheckedChanged(object sender, EventArgs e)
+        private void radioButtonFilterByLocation_CheckedChanged(object i_Sender, EventArgs i_)
         {
             textBoxLocation.Enabled = !textBoxLocation.Enabled;
         }
 
-        private void radioButtonFilterByDate_CheckedChanged(object sender, EventArgs e)
+        private void radioButtonFilterByDate_CheckedChanged(object i_Sender, EventArgs i_)
         {
             dateTimePickerStartDate.Enabled = !dateTimePickerStartDate.Enabled;
             dateTimePickerEndDate.Enabled = !dateTimePickerEndDate.Enabled;
         }
 
-        private void ListBoxOfPhotos_SelectedIndexChanged(object sender, EventArgs e)
+        private void ListBoxOfPhotos_SelectedIndexChanged(object i_Sender, EventArgs i_)
         {
             Photo currentPhoto = listBoxOfPhotos.SelectedItem as Photo;
 
@@ -272,21 +274,21 @@
             }
         }
 
-        private void buttonCheckFriendsInfo_Click(object sender, EventArgs e)
+        private void buttonCheckFriendsInfo_Click(object i_Sender, EventArgs i_)
         {
-            string amountOfYoungerFriends = null;
-            string amountOfOlderFriends = m_FacebookFacade.amountOfOlderAndYoungerFriendsFeature(amountOfYoungerFriends);
+            string amountOfYoungerFriends = "0";
+            string amountOfOlderFriends = m_FacebookFacade.AmountOfOlderAndYoungerFriendsFeature(ref amountOfYoungerFriends);
             FacebookObjectCollection<User> friendsBornOnTheSameDate =
-                m_FacebookFacade.FriendsBornOnTheSameDateFeatue();
+                m_FacebookFacade.FriendsBornOnTheSameDateFeature();
             FacebookObjectCollection<User> friendsLiningInSameCity =
-                m_FacebookFacade.ExtractFriendsByCityFeatue();
+                m_FacebookFacade.ExtractFriendsByCityFeature();
             labelAmountOfOlderFriends.Text = amountOfOlderFriends;
             labelAmountOfYoungerFriends.Text = amountOfYoungerFriends;
             fetchListBox(listBoxOfFriendsLiveInSameCity, friendsLiningInSameCity);
             fetchListBox(listBoxOfFriendsBornOnSameDate, friendsBornOnTheSameDate);
         }
 
-        private void buttonFetchLikedPages_Click(object sender, EventArgs e)
+        private void buttonFetchLikedPages_Click(object i_Sender, EventArgs i_)
         {
             inputUserInformation<Page>(listBoxOfPagesLiked, "LikedPages");
         }

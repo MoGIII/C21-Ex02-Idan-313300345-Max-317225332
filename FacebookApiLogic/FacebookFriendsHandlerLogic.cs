@@ -1,13 +1,13 @@
-﻿namespace BasicFacebookFeatures
-{
-    using System;
-    using System.Globalization;
-    using FacebookApiLogic;
-    using FacebookWrapper.ObjectModel;
+﻿using System;
+using System.Globalization;
+using FacebookWrapper.ObjectModel;
 
+namespace FacebookApiLogic
+{
     public class FacebookFriendsHandlerLogic : IFacebookFriendsHandler
     {
         private readonly User r_LoggedUser;
+        public IFriendsBirthdayCheckingStrategy BirthdayCheckingStrategy { get; set; }
 
         public FacebookFriendsHandlerLogic(User i_User)
         {
@@ -51,16 +51,26 @@
             return listBoxOfFriendsOfSameBirthday;
         }
 
-        public string DisplayGeneralInformation(string o_AmountOfYoungerFriendsCount)
+        public string DisplayGeneralInformation(ref string i_AmountOfYoungerFriendsCount)
         {
-            string amountOfOlderFriends = fetchFriendsAgeCounts(o_AmountOfYoungerFriendsCount);
+            string amountOfOlderFriends = FetchFriendsAgeCounts(ref i_AmountOfYoungerFriendsCount);
 
             return amountOfOlderFriends;
         }
 
-        public string fetchFriendsAgeCounts(string o_AmountOfYoungerFriendsCount)
+        public string FetchFriendsAgeCounts(ref string i_AmountOfYoungerFriendsCount)
         {
-            int olderFriendsAmount = 0;
+            BirthdayCheckingStrategy = new CheckOlderFriendsStrategy();
+            string amountOfOlderFriends = FetchFriendsAgeCounts();
+            BirthdayCheckingStrategy = new CheckYoungerFriendsStrategy();
+            i_AmountOfYoungerFriendsCount = FetchFriendsAgeCounts();
+            return amountOfOlderFriends;
+        }
+
+
+        public string FetchFriendsAgeCounts()
+        {
+            //int olderFriendsAmount = 0;
             int youngerFriendsAmount = 0;
             const string k_DatePattern = "MM/dd/yyyy";
 
@@ -70,20 +80,20 @@
                 {
                     DateTime friendsBirthday = DateTime.ParseExact(friend.Birthday, k_DatePattern, CultureInfo.InvariantCulture);
                     DateTime usersBirthday = DateTime.ParseExact(r_LoggedUser.Birthday, k_DatePattern, CultureInfo.InvariantCulture);
-                    if(friendsBirthday > usersBirthday)
+                    if (BirthdayCheckingStrategy.CheckFriendsBirthday(friendsBirthday, usersBirthday))
                     {
                         youngerFriendsAmount++;
                     }
 
-                    if(friendsBirthday < usersBirthday)
-                    {
-                        olderFriendsAmount++;
-                    }
+                    //if(friendsBirthday < usersBirthday)
+                    //{
+                    //    olderFriendsAmount++;
+                    //}
                 }
             }
 
-            o_AmountOfYoungerFriendsCount = youngerFriendsAmount.ToString();
-            return olderFriendsAmount.ToString();
+            //i_AmountOfYoungerFriendsCount = youngerFriendsAmount.ToString();
+            return youngerFriendsAmount.ToString();
         }
 
         public DateTime? LastTimeUpdateDate()

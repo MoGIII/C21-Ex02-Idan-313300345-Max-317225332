@@ -1,13 +1,13 @@
-﻿namespace BasicFacebookFeatures
-{
-    using System;
-    using FacebookWrapper;
-    using FacebookWrapper.ObjectModel;
+﻿using System;
+using FacebookWrapper;
+using FacebookWrapper.ObjectModel;
 
+namespace FacebookApiLogic
+{
     internal sealed class FacebookConnectionMangerSingleton
     {
         private static FacebookConnectionMangerSingleton s_Instance = null;
-        private static object s_LockObj = new Object();
+        private static readonly object sr_LockObj = new object();
         private const string k_AppId = "771374110194582";
         public User LoggedInUser { get;private set; }
         public LoginResult LoginResult { get;private set; } = null;
@@ -20,7 +20,7 @@
             {
                 if (s_Instance == null)
                 {
-                    lock (s_LockObj)
+                    lock (sr_LockObj)
                     {
                         if (s_Instance == null)
                         {
