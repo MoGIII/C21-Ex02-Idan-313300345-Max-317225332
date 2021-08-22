@@ -4,7 +4,7 @@ using FacebookWrapper.ObjectModel;
 
 namespace FacebookApiLogic
 {
-    public class FacebookFriendsHandlerLogic : IFacebookFriendsHandler
+    internal class FacebookFriendsHandlerLogic : IFacebookFriendsHandler
     {
         private readonly User r_LoggedUser;
         public IFriendsBirthdayCheckingStrategy BirthdayCheckingStrategy { get; set; }

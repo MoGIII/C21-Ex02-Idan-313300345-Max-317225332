@@ -79,10 +79,7 @@ namespace FacebookApiLogic
 
         public string DisplayGeneralInformation(ref string i_AmountOfYoungerFriendsCount)
         {
-            //r_FriendsHandlerLogic.BirthdayCheckingStrategy = new CheckOlderFriendsStrategy();
             m_OlderFriendsCount = FetchFriendsAgeCounts(ref i_AmountOfYoungerFriendsCount);
-            //r_FriendsHandlerLogic.BirthdayCheckingStrategy = new CheckYoungerFriendsStrategy();
-            //i_AmountOfYoungerFriendsCount = FetchFriendsAgeCounts(ref m_YoungerFriendsCount);
             return m_OlderFriendsCount;
         }
     }

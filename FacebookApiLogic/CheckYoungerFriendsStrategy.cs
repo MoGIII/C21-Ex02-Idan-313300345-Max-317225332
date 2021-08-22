@@ -2,7 +2,7 @@
 
 namespace FacebookApiLogic
 {
-    public class CheckYoungerFriendsStrategy: IFriendsBirthdayCheckingStrategy
+    internal class CheckYoungerFriendsStrategy: IFriendsBirthdayCheckingStrategy
     {
         public bool CheckFriendsBirthday(DateTime i_FriendsBirthday, DateTime i_UserBirthday)
         {
